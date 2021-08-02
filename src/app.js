@@ -3,6 +3,9 @@ require('./db/conn');
 
 const app=express();
 
+const store = require('store');
+
+
 
     // const exphbs  = require(''); 
     // "express-handlebars"
@@ -42,6 +45,7 @@ app.use(express.urlencoded({extended:false}));
 const port=process.env.PORT || 8000;
 
 app.get('/',(req,res)=>{
+    store.set('user',{email:"no user"});
     res.render("slider");
 
 })
@@ -73,7 +77,8 @@ app.post('/loginapi', async(req,res)=>{
         if(emailcheck==null) res.send("invalid email address, try again");
         if(emailcheck.password===password){
             console.log("login successfull");
-            res.render("afterlogin");
+            store.set('user',{email:email});
+            res.render("cv");
         }
         else{
             res.send("invalid password");
@@ -137,6 +142,20 @@ app.post('/student',(req,res)=>{
         res.send(e);
     })
     // res.send("Rohit this side");
+})
+
+app.get('/cv',(req,res)=>{
+
+    const set=store.get('user');
+    console.log(set.email);
+    if(set.email!='no user'){
+
+        res.render("cv");
+        
+    }
+    else{
+        res.send("You are not valid user, Please login first");
+    }
 })
 
 app.get('*', function(req, res){
